@@ -10,8 +10,9 @@ setup(
     description="Python integration library for BaseLinker API",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/your-username/baselinker-api",
+    url="https://github.com/mareksybilak/baselinker-api",
     packages=find_packages(),
+    license_files=["LICENSE"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

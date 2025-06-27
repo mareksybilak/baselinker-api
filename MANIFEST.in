@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+recursive-include baselinker *.py
+recursive-include tests *.py
