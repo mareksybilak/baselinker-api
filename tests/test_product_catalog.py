@@ -23,7 +23,10 @@ class TestProductCatalog:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_inventory_products_data(inventory_id=123)
+        result = client.products.get_inventory_products_data(
+            inventory_id=123,
+            products=["ABC123"]
+        )
         
         assert "products" in result
         assert len(result["products"]) == 1
@@ -31,7 +34,10 @@ class TestProductCatalog:
         
         expected_data = {
             'method': 'getInventoryProductsData',
-            'parameters': json.dumps({"inventory_id": 123})
+            'parameters': json.dumps({
+                "inventory_id": 123,
+                "products": ["ABC123"]
+            })
         }
         mock_post.assert_called_with(
             "https://api.baselinker.com/connector.php",
@@ -47,7 +53,7 @@ class TestProductCatalog:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.delete_inventory_product(
+        result = client.products.delete_inventory_product(
             inventory_id=123,
             product_id="ABC123"
         )
@@ -82,7 +88,7 @@ class TestProductCatalog:
                 {"product_id": "DEF456", "variant_id": 0, "stock": 30}
             ]
         }
-        result = client.update_inventory_products_stock(**stock_data)
+        result = client.products.update_inventory_products_stock(**stock_data)
         
         assert result["status"] == "SUCCESS"
         assert "warnings" in result
@@ -106,7 +112,7 @@ class TestProductCatalog:
                 }
             ]
         }
-        result = client.update_inventory_products_prices(**price_data)
+        result = client.products.update_inventory_products_prices(**price_data)
         
         assert result["status"] == "SUCCESS"
     
@@ -123,7 +129,7 @@ class TestProductCatalog:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_inventory_categories(inventory_id=123)
+        result = client.products.get_inventory_categories(inventory_id=123)
         
         assert "categories" in result
         assert len(result["categories"]) == 2
@@ -142,7 +148,7 @@ class TestProductCatalog:
             "name": "New Category",
             "parent_id": 1
         }
-        result = client.add_inventory_category(**category_data)
+        result = client.products.add_inventory_category(**category_data)
         
         assert result["status"] == "SUCCESS"
         assert result["category_id"] == 3
@@ -155,7 +161,7 @@ class TestProductCatalog:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.delete_inventory_category(
+        result = client.products.delete_inventory_category(
             inventory_id=123,
             category_id=3
         )
@@ -175,7 +181,7 @@ class TestProductCatalog:
             "description": "Test inventory",
             "languages": ["pl", "en"]
         }
-        result = client.add_inventory(**inventory_data)
+        result = client.products.add_inventory(**inventory_data)
         
         assert result["status"] == "SUCCESS"
         assert result["inventory_id"] == 456
@@ -188,7 +194,7 @@ class TestProductCatalog:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.delete_inventory(inventory_id=456)
+        result = client.products.delete_inventory(inventory_id=456)
         
         assert result["status"] == "SUCCESS"
         

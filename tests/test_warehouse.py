@@ -27,7 +27,7 @@ class TestWarehouse:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_inventory_warehouses(inventory_id=123)
+        result = client.inventory.get_inventory_warehouses(inventory_id=123)
         
         assert "warehouses" in result
         assert len(result["warehouses"]) == 2
@@ -56,11 +56,12 @@ class TestWarehouse:
         client = BaseLinkerClient("test-token")
         warehouse_data = {
             "inventory_id": 123,
+            "warehouse_id": "new_wh_001",
             "name": "New Warehouse",
             "description": "Additional storage facility",
             "stock_edition": True
         }
-        result = client.add_inventory_warehouse(**warehouse_data)
+        result = client.inventory.add_inventory_warehouse(**warehouse_data)
         
         assert result["status"] == "SUCCESS"
         assert result["warehouse_id"] == 3
@@ -83,7 +84,7 @@ class TestWarehouse:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.delete_inventory_warehouse(
+        result = client.inventory.delete_inventory_warehouse(
             inventory_id=123,
             warehouse_id=3
         )
@@ -124,7 +125,7 @@ class TestWarehouse:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_inventory_price_groups(inventory_id=123)
+        result = client.inventory.get_inventory_price_groups(inventory_id=123)
         
         assert "price_groups" in result
         assert len(result["price_groups"]) == 2
@@ -143,11 +144,12 @@ class TestWarehouse:
         client = BaseLinkerClient("test-token")
         price_group_data = {
             "inventory_id": 123,
+            "price_group_id": 3,
             "name": "VIP Pricing",
             "description": "Special pricing for VIP customers",
             "currency": "PLN"
         }
-        result = client.add_inventory_price_group(**price_group_data)
+        result = client.inventory.add_inventory_price_group(**price_group_data)
         
         assert result["status"] == "SUCCESS"
         assert result["price_group_id"] == 3
@@ -160,7 +162,7 @@ class TestWarehouse:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.delete_inventory_price_group(
+        result = client.inventory.delete_inventory_price_group(
             inventory_id=123,
             price_group_id=3
         )
@@ -192,22 +194,24 @@ class TestWarehouse:
         # Test adding warehouse with all optional parameters
         complex_warehouse_data = {
             "inventory_id": 123,
+            "warehouse_id": "complex_wh_001",
             "name": "Complex Warehouse",
             "description": "Full featured warehouse",
             "stock_edition": True,
             "is_default": False,
             "disable_stock_level_below_zero": True
         }
-        result = client.add_inventory_warehouse(**complex_warehouse_data)
+        result = client.inventory.add_inventory_warehouse(**complex_warehouse_data)
         assert result["status"] == "SUCCESS"
         
         # Test price group with currency and discount settings
         complex_price_group = {
             "inventory_id": 123,
+            "price_group_id": 5,
             "name": "Premium Group",
             "description": "Premium customer pricing",
             "currency": "EUR",
             "price_modifier_percent": -10
         }
-        result = client.add_inventory_price_group(**complex_price_group)
+        result = client.inventory.add_inventory_price_group(**complex_price_group)
         assert result["status"] == "SUCCESS"

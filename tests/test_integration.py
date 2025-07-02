@@ -55,8 +55,10 @@ class TestIntegration:
             
             if i == 0:
                 # Add order
-                result = client.add_order(
+                result = client.orders.add_order(
                     order_source_id=1,
+                    date_add=1640995200,
+                    order_status_id=1,
                     delivery_price=15.99,
                     user_comments="Test order"
                 )
@@ -64,29 +66,30 @@ class TestIntegration:
                 
             elif i == 1:
                 # Add product to order
-                result = client.add_order_product(
+                result = client.orders.add_order_product(
                     order_id=12345,
                     product_id="TEST123",
                     name="Test Product",
                     quantity=2,
-                    price=29.99
+                    price_brutto=29.99,
+                    tax_rate=23.0
                 )
                 assert result["order_product_id"] == 67890
                 
             elif i == 2:
                 # Update order status
-                result = client.set_order_status(order_id=12345, status_id=2)
+                result = client.orders.set_order_status(order_id=12345, status_id=2)
                 assert result["status"] == "SUCCESS"
                 
             elif i == 3:
                 # Get order details
-                result = client.get_orders(order_id=12345)
+                result = client.orders.get_orders(order_id=12345)
                 assert len(result["orders"]) == 1
                 assert result["orders"][0]["status_id"] == 2
                 
             elif i == 4:
                 # Create package
-                result = client.create_package(
+                result = client.courier.create_package(
                     order_id=12345,
                     courier_code="DPD"
                 )
@@ -94,7 +97,7 @@ class TestIntegration:
                 
             elif i == 5:
                 # Get shipping label
-                result = client.get_label(package_id=111)
+                result = client.courier.get_label(package_id=111)
                 assert "label" in result
     
     @patch('requests.Session.post')
@@ -123,11 +126,11 @@ class TestIntegration:
             mock_response.json.return_value = response
             
             if i == 0:
-                result = client.get_inventories()
+                result = client.products.get_inventories()
                 assert len(result["inventories"]) == 1
                 
             elif i == 1:
-                result = client.add_inventory_product(
+                result = client.products.add_inventory_product(
                     inventory_id=123,
                     product_id="NEW123",
                     name="New Product",
@@ -136,21 +139,24 @@ class TestIntegration:
                 assert result["product_id"] == "NEW123"
                 
             elif i == 2:
-                result = client.update_inventory_products_stock(
+                result = client.products.update_inventory_products_stock(
                     inventory_id=123,
                     products=[{"product_id": "NEW123", "stock": 50}]
                 )
                 assert result["status"] == "SUCCESS"
                 
             elif i == 3:
-                result = client.update_inventory_products_prices(
+                result = client.products.update_inventory_products_prices(
                     inventory_id=123,
                     products=[{"product_id": "NEW123", "price_netto": 30.00}]
                 )
                 assert result["status"] == "SUCCESS"
                 
             elif i == 4:
-                result = client.get_inventory_products_data(inventory_id=123)
+                result = client.products.get_inventory_products_data(
+                    inventory_id=123,
+                    products=["NEW123"]
+                )
                 assert result["products"][0]["stock"] == 50
     
     @patch('requests.Session.post')
@@ -168,7 +174,7 @@ class TestIntegration:
         }
         
         with pytest.raises(AuthenticationError):
-            client.get_orders()
+            client.orders.get_orders()
         
         # Test rate limit error
         mock_response.json.return_value = {
@@ -177,7 +183,7 @@ class TestIntegration:
         }
         
         with pytest.raises(RateLimitError):
-            client.get_inventories()
+            client.products.get_inventories()
         
         # Test generic API error
         mock_response.json.return_value = {
@@ -186,7 +192,11 @@ class TestIntegration:
         }
         
         with pytest.raises(APIError) as exc_info:
-            client.add_order()
+            client.orders.add_order(
+                order_source_id=1,
+                date_add=1640995200,
+                order_status_id=1
+            )
         
         assert exc_info.value.error_code == "ERROR_UNKNOWN"
     
@@ -211,7 +221,7 @@ class TestIntegration:
         
         mock_response.json.return_value = {"status": "SUCCESS"}
         
-        client.update_inventory_products_stock(**test_params)
+        client.products.update_inventory_products_stock(**test_params)
         
         # Verify the call was made with properly encoded parameters
         call_args = mock_post.call_args
@@ -264,7 +274,7 @@ class TestIntegration:
         mock_response.raise_for_status.return_value = None
         mock_post.return_value = mock_response
         
-        client.get_orders()
+        client.orders.get_orders()
         
         # Verify timeout was passed to request
         call_args = mock_post.call_args
@@ -274,6 +284,6 @@ class TestIntegration:
         mock_post.side_effect = requests.exceptions.Timeout("Request timeout")
         
         with pytest.raises(Exception) as exc_info:
-            client.get_orders()
+            client.orders.get_orders()
         
         assert "timeout" in str(exc_info.value).lower()

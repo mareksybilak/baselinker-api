@@ -50,7 +50,7 @@ from datetime import datetime, timedelta
 
 # Get orders from last 7 days
 week_ago = int((datetime.now() - timedelta(days=7)).timestamp())
-orders = client.get_orders(date_from=week_ago)
+orders = client.orders.get_orders(date_from=week_ago)
 
 print(f"Found {len(orders.get('orders', []))} orders")
 
@@ -96,7 +96,7 @@ new_order_data = {
 }
 
 try:
-    result = client.add_order(**new_order_data)
+    result = client.orders.add_order(**new_order_data)
     order_id = result.get('order_id')
     print(f"Order created successfully with ID: {order_id}")
 except Exception as e:
@@ -107,7 +107,7 @@ except Exception as e:
 
 ```python
 # Get order sources first
-sources = client.get_order_sources()
+sources = client.orders.get_order_sources()
 print("Available order sources:")
 for source in sources.get('sources', []):
     print(f"ID: {source['id']}, Name: {source['name']}")
@@ -117,7 +117,7 @@ order_id = 12345
 new_status_id = 2  # Confirmed status
 
 try:
-    result = client.set_order_status(order_id=order_id, status_id=new_status_id)
+    result = client.orders.set_order_status(order_id=order_id, status_id=new_status_id)
     if result.get('status') == 'SUCCESS':
         print(f"Order {order_id} status updated successfully")
 except Exception as e:
@@ -134,7 +134,7 @@ product_data = {
 }
 
 try:
-    result = client.add_order_product(**product_data)
+    result = client.orders.add_order_product(**product_data)
     print(f"Product added to order with ID: {result.get('order_product_id')}")
 except Exception as e:
     print(f"Failed to add product to order: {e}")
@@ -146,7 +146,7 @@ except Exception as e:
 
 ```python
 # Get all inventories
-inventories = client.get_inventories()
+inventories = client.products.get_inventories()
 print("Available inventories:")
 
 for inventory in inventories.get('inventories', []):
@@ -168,7 +168,7 @@ else:
 
 ```python
 # Search for products
-products = client.get_inventory_products_list(
+products = client.products.get_inventory_products_list(
     inventory_id=inventory_id,
     filter_name="laptop",
     filter_limit=10,
@@ -180,7 +180,7 @@ print(f"Found {len(products.get('products', []))} products")
 # Get detailed product data
 if products.get('products'):
     product_ids = [p['product_id'] for p in products['products'][:5]]
-    detailed_data = client.get_inventory_products_data(
+    detailed_data = client.products.get_inventory_products_data(
         inventory_id=inventory_id,
         products=product_ids
     )
@@ -237,7 +237,7 @@ new_product = {
 }
 
 try:
-    result = client.add_inventory_product(**new_product)
+    result = client.products.add_inventory_product(**new_product)
     print(f"Product added successfully: {result.get('product_id')}")
 except Exception as e:
     print(f"Failed to add product: {e}")
@@ -264,7 +264,7 @@ stock_updates = {
 }
 
 try:
-    result = client.update_inventory_products_stock(**stock_updates)
+    result = client.products.update_inventory_products_stock(**stock_updates)
     print(f"Stock update status: {result.get('status')}")
     if result.get('warnings'):
         print("Warnings:")
@@ -287,7 +287,7 @@ price_updates = {
 }
 
 try:
-    result = client.update_inventory_products_prices(**price_updates)
+    result = client.products.update_inventory_products_prices(**price_updates)
     print(f"Price update status: {result.get('status')}")
 except Exception as e:
     print(f"Failed to update prices: {e}")
@@ -299,7 +299,7 @@ except Exception as e:
 
 ```python
 # Get categories
-categories = client.get_inventory_categories(inventory_id=inventory_id)
+categories = client.products.get_inventory_categories(inventory_id=inventory_id)
 print("Product categories:")
 
 def print_categories(cats, level=0):
@@ -319,7 +319,7 @@ new_category = {
 }
 
 try:
-    result = client.add_inventory_category(**new_category)
+    result = client.products.add_inventory_category(**new_category)
     category_id = result.get('category_id')
     print(f"Category created with ID: {category_id}")
     
@@ -330,7 +330,7 @@ try:
         "parent_id": category_id
     }
     
-    sub_result = client.add_inventory_category(**subcategory)
+    sub_result = client.products.add_inventory_category(**subcategory)
     print(f"Subcategory created with ID: {sub_result.get('category_id')}")
     
 except Exception as e:
@@ -341,7 +341,7 @@ except Exception as e:
 
 ```python
 # Get warehouses
-warehouses = client.get_inventory_warehouses(inventory_id=inventory_id)
+warehouses = client.inventory.get_inventory_warehouses(inventory_id=inventory_id)
 print("Warehouses:")
 
 for warehouse in warehouses.get('warehouses', []):
@@ -361,7 +361,7 @@ new_warehouse = {
 }
 
 try:
-    result = client.add_inventory_warehouse(**new_warehouse)
+    result = client.inventory.add_inventory_warehouse(**new_warehouse)
     warehouse_id = result.get('warehouse_id')
     print(f"Warehouse created with ID: {warehouse_id}")
 except Exception as e:
@@ -374,7 +374,7 @@ except Exception as e:
 
 ```python
 # Get available couriers
-couriers = client.get_couriers_list()
+couriers = client.courier.get_couriers_list()
 print("Available couriers:")
 
 for courier in couriers.get('couriers', []):
@@ -403,7 +403,7 @@ package_data = {
 }
 
 try:
-    result = client.create_package(**package_data)
+    result = client.courier.create_package(**package_data)
     package_id = result.get('package_id')
     tracking_number = result.get('tracking_number')
     
@@ -413,7 +413,7 @@ try:
     
     # Get shipping label
     if package_id:
-        label_result = client.get_label(package_id=package_id)
+        label_result = client.courier.get_label(package_id=package_id)
         if label_result.get('label'):
             print("Shipping label generated successfully")
             # Save label to file
@@ -449,7 +449,7 @@ pickup_data = {
 }
 
 try:
-    result = client.request_parcel_pickup(**pickup_data)
+    result = client.courier.request_parcel_pickup(**pickup_data)
     print(f"Pickup requested:")
     print(f"  Pickup ID: {result.get('pickup_id')}")
     print(f"  Date: {result.get('pickup_date')}")
@@ -483,7 +483,15 @@ def safe_api_call(client, method_name, max_retries=3, **kwargs):
     """
     for attempt in range(max_retries):
         try:
-            method = getattr(client, method_name)
+            # For modular architecture, we need to access methods through modules
+            # This is a simplified example - in practice you'd route to correct module
+            if method_name.startswith('get_orders') or method_name in ['add_order', 'set_order_status']:
+                method = getattr(client.orders, method_name.replace('get_orders', 'get_orders'))
+            elif method_name in ['get_inventories']:
+                method = getattr(client.products, method_name)
+            else:
+                # Generic fallback - determine correct module based on method name
+                method = getattr(client.orders, method_name) if 'order' in method_name else getattr(client.products, method_name)
             result = method(**kwargs)
             logger.info(f"API call {method_name} successful")
             return result
@@ -525,8 +533,8 @@ client = BaseLinkerClient("your-token")
 
 try:
     # Safe API calls with automatic retry
-    orders = safe_api_call(client, 'get_orders', date_from=1640995200)
-    inventories = safe_api_call(client, 'get_inventories')
+    orders = client.orders.get_orders(date_from=1640995200)
+    inventories = client.products.get_inventories()
     
     print(f"Retrieved {len(orders.get('orders', []))} orders")
     print(f"Found {len(inventories.get('inventories', []))} inventories")
@@ -551,9 +559,7 @@ def batch_update_stock(client, inventory_id, stock_updates, batch_size=50):
         batch = stock_updates[i:i + batch_size]
         
         try:
-            result = safe_api_call(
-                client,
-                'update_inventory_products_stock',
+            result = client.products.update_inventory_products_stock(
                 inventory_id=inventory_id,
                 products=batch
             )
@@ -637,7 +643,7 @@ def process_order_batch(client, order_ids):
     
     for order_id in order_ids:
         try:
-            order_data = safe_api_call(client, 'get_orders', order_id=order_id)
+            order_data = client.orders.get_orders(order_id=order_id)
             results.append(order_data)
         except Exception as e:
             logger.error(f"Failed to process order {order_id}: {e}")
@@ -686,7 +692,7 @@ def sync_inventory_with_external_system(client, inventory_id, external_data):
     Synchronize BaseLinker inventory with external system
     """
     # Get current inventory state
-    current_products = client.get_inventory_products_list(
+    current_products = client.products.get_inventory_products_list(
         inventory_id=inventory_id,
         filter_limit=1000
     )
@@ -725,7 +731,7 @@ def sync_inventory_with_external_system(client, inventory_id, external_data):
             }
             
             try:
-                safe_api_call(client, 'add_inventory_product', **product_data)
+                client.products.add_inventory_product(**product_data)
                 print(f"Added product: {external_product['id']}")
             except Exception as e:
                 print(f"Failed to add {external_product['id']}: {e}")
@@ -751,9 +757,7 @@ def sync_inventory_with_external_system(client, inventory_id, external_data):
     # Batch update stock and prices
     if stock_updates:
         try:
-            safe_api_call(
-                client,
-                'update_inventory_products_stock',
+            client.products.update_inventory_products_stock(
                 inventory_id=inventory_id,
                 products=stock_updates
             )
@@ -763,9 +767,7 @@ def sync_inventory_with_external_system(client, inventory_id, external_data):
     
     if price_updates:
         try:
-            safe_api_call(
-                client,
-                'update_inventory_products_prices',
+            client.products.update_inventory_products_prices(
                 inventory_id=inventory_id,
                 products=price_updates
             )
@@ -776,9 +778,7 @@ def sync_inventory_with_external_system(client, inventory_id, external_data):
     # Remove obsolete products
     for product_id in to_remove:
         try:
-            safe_api_call(
-                client,
-                'delete_inventory_product',
+            client.products.delete_inventory_product(
                 inventory_id=inventory_id,
                 product_id=product_id
             )

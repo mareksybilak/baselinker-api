@@ -30,7 +30,7 @@ class TestOrderReturns:
                 }
             ]
         }
-        result = client.add_order_return(**return_data)
+        result = client.returns.add_order_return(**return_data)
         
         assert result["status"] == "SUCCESS"
         assert result["return_id"] == 12345
@@ -85,7 +85,7 @@ class TestOrderReturns:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_order_returns(date_from=1640995200)
+        result = client.returns.get_order_returns(date_from=1640995200)
         
         assert "returns" in result
         assert len(result["returns"]) == 2
@@ -115,7 +115,7 @@ class TestOrderReturns:
             "admin_comments": "Return approved - refund processed",
             "return_reason": "Quality issue - approved for refund"
         }
-        result = client.set_order_return_fields(**update_data)
+        result = client.returns.set_order_return_fields(**update_data)
         
         assert result["status"] == "SUCCESS"
         
@@ -137,7 +137,7 @@ class TestOrderReturns:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.set_order_return_status(
+        result = client.returns.set_order_return_status(
             return_id=12345,
             return_status=3  # Assuming 3 = Completed
         )
@@ -194,7 +194,7 @@ class TestOrderReturns:
                 "country": "PL"
             }
         }
-        result = client.add_order_return(**complex_return)
+        result = client.returns.add_order_return(**complex_return)
         assert result["status"] == "SUCCESS"
         assert result["return_id"] == 99999
         
@@ -205,11 +205,11 @@ class TestOrderReturns:
             "admin_comments": "Return received and inspected - approved",
             "return_reason": "Quality control issues confirmed"
         }
-        result = client.set_order_return_fields(**update_fields)
+        result = client.returns.set_order_return_fields(**update_fields)
         assert result["status"] == "SUCCESS"
         
         # Step 3: Change status to completed
-        result = client.set_order_return_status(return_id=99999, return_status=3)
+        result = client.returns.set_order_return_status(return_id=99999, return_status=3)
         assert result["status"] == "SUCCESS"
     
     @patch('requests.Session.post')
@@ -230,7 +230,7 @@ class TestOrderReturns:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_order_returns(
+        result = client.returns.get_order_returns(
             date_from=1641081600,
             date_to=1641254400,
             return_status=2,

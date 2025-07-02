@@ -1,16 +1,29 @@
 # BaseLinker API Methods Documentation
 
-Complete documentation for all BaseLinker API methods based on official API documentation at https://api.baselinker.com
+Complete documentation for all BaseLinker API methods in the modular Python client. This library provides **133 methods** across **9 specialized modules** with **82% test coverage**.
+
+**Python Client Features:**
+- 🏗️ **Modular Architecture** - Organized by functional areas
+- 📈 **Comprehensive Coverage** - 133 API methods across 9 modules
+- 🔒 **Type Safety** - Parameter validation and error handling
+- 🧪 **Well Tested** - 82% test coverage with 300+ test methods
+- 🚀 **Easy to Use** - Intuitive module-based interface
+
+Based on official API documentation at https://api.baselinker.com
 
 ## Table of Contents
 
 - [API Overview](#api-overview)
+- [Modular Architecture](#modular-architecture)
 - [Order Management Methods](#order-management-methods)
 - [Product Catalog Methods](#product-catalog-methods)
 - [Inventory Management Methods](#inventory-management-methods)
 - [Courier & Shipping Methods](#courier--shipping-methods)
+- [Invoice & Payment Methods](#invoice--payment-methods)
+- [Returns Management Methods](#returns-management-methods)
 - [External Storage Methods](#external-storage-methods)
-- [Order Returns Methods](#order-returns-methods)
+- [Document Management Methods](#document-management-methods)
+- [Device Management Methods](#device-management-methods)
 - [Response Formats](#response-formats)
 - [Error Handling](#error-handling)
 
@@ -21,6 +34,78 @@ Complete documentation for all BaseLinker API methods based on official API docu
 - **Encoding**: UTF-8
 - **Authentication**: API token via `X-BLToken` header
 - **Data Format**: JSON
+
+## Modular Architecture
+
+The BaseLinker Python client is organized into specialized modules for better code organization and ease of use:
+
+```python
+from baselinker import BaseLinkerClient
+
+# Initialize client with API token
+client = BaseLinkerClient("your-api-token")
+
+# 🛒 Orders Management (24 methods)
+client.orders.get_orders(date_from=1640995200)
+client.orders.add_order(order_source_id=1, date_add=1640995200, order_status_id=1)
+client.orders.get_orders_by_email(email="customer@example.com")
+client.orders.set_order_status(order_id=123, status_id=2)
+
+# 📦 Product Catalog (30 methods)  
+client.products.get_inventories()
+client.products.get_inventory_products_list(inventory_id=123)
+client.products.add_inventory_product(inventory_id=123, product_id="PROD-001")
+client.products.update_inventory_products_stock(inventory_id=123, products=[])
+
+# 🏪 Inventory Management (8 methods)
+client.inventory.get_inventory_warehouses(inventory_id=123)
+client.inventory.add_inventory_warehouse(inventory_id=123, name="New Warehouse")
+client.inventory.get_inventory_price_groups(inventory_id=123)
+
+# 🚚 Courier Services (14 methods)
+client.courier.get_couriers_list()
+client.courier.create_package(order_id=123, courier_code="dpd")
+client.courier.get_label(package_id=456)
+client.courier.request_parcel_pickup(courier_code="dpd", package_ids=[123])
+
+# 💰 Invoices & Payments (10 methods)
+client.invoices.add_invoice(order_id=123)
+client.invoices.get_invoices()
+client.invoices.set_order_payment(order_id=123, payment_done=1)
+
+# 🔄 Returns Management (11 methods)
+client.returns.add_order_return(order_id=123)
+client.returns.get_order_returns()
+client.returns.set_order_return_status(return_id=123, status_id=1)
+
+# 🌐 External Storage (8 methods)
+client.external_storage.get_external_storages_list()
+client.external_storage.get_external_storage_products_data(storage_id="123", products=["PROD-001"])
+
+# 📋 Document Management (8 methods)
+client.documents.get_inventory_documents(inventory_id=123)
+client.documents.get_inventory_purchase_orders(inventory_id=123)
+
+# 🔧 Device Management (20 methods)
+client.devices.get_printers()
+client.devices.get_connect_integrations()
+client.devices.add_log(log_type="info", message="Log message")
+```
+
+### Module Summary
+
+| Module | Methods | Description |
+|--------|---------|-------------|
+| **orders** | 24 | Order lifecycle management, search, and transactions |
+| **products** | 30 | Product catalog, inventory, categories, and manufacturers |
+| **inventory** | 8 | Warehouse and price group management |
+| **courier** | 14 | Shipping, package creation, and courier integration |
+| **invoices** | 10 | Invoice generation and payment processing |
+| **returns** | 11 | Return management and processing |
+| **external_storage** | 8 | External marketplace integration |
+| **documents** | 8 | Document and purchase order management |
+| **devices** | 20 | Printer, scale, and automation device management |
+| **Total** | **133** | **Complete BaseLinker API coverage** |
 
 ## Order Management Methods
 

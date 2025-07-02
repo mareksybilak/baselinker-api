@@ -20,7 +20,7 @@ class TestOrderManagement:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_order_sources()
+        result = client.orders.get_order_sources()
         
         assert "sources" in result
         assert len(result["sources"]) == 2
@@ -48,7 +48,7 @@ class TestOrderManagement:
             "admin_comments": "Updated comment",
             "delivery_price": 15.99
         }
-        result = client.set_order_fields(**order_data)
+        result = client.orders.set_order_fields(**order_data)
         
         assert result["status"] == "SUCCESS"
         
@@ -70,7 +70,7 @@ class TestOrderManagement:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.set_order_status(order_id=123, status_id=2)
+        result = client.orders.set_order_status(order_id=123, status_id=2)
         
         assert result["status"] == "SUCCESS"
         
@@ -97,9 +97,10 @@ class TestOrderManagement:
             "product_id": "ABC123",
             "name": "Test Product",
             "quantity": 2,
-            "price": 29.99
+            "price_brutto": 29.99,
+            "tax_rate": 23.0
         }
-        result = client.add_order_product(**product_data)
+        result = client.orders.add_order_product(**product_data)
         
         assert result["status"] == "SUCCESS"
         assert result["order_product_id"] == 456
@@ -128,7 +129,7 @@ class TestOrderManagement:
             "quantity": 3,
             "price": 24.99
         }
-        result = client.set_order_product_fields(**update_data)
+        result = client.orders.set_order_product_fields(**update_data)
         
         assert result["status"] == "SUCCESS"
     
@@ -140,7 +141,7 @@ class TestOrderManagement:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.delete_order_product(order_id=123, order_product_id=456)
+        result = client.orders.delete_order_product(order_id=123, order_product_id=456)
         
         assert result["status"] == "SUCCESS"
     
@@ -157,7 +158,7 @@ class TestOrderManagement:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_journal_list(last_log_id=0)
+        result = client.orders.get_journal_list(last_log_id=0)
         
         assert "journal" in result
         assert len(result["journal"]) == 2
@@ -175,7 +176,7 @@ class TestOrderManagement:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_order_transaction_data(order_id=123)
+        result = client.orders.get_order_transaction_data(order_id=123)
         
         assert result["transaction_id"] == "TXN123"
         assert result["amount"] == 99.99
@@ -193,7 +194,7 @@ class TestOrderManagement:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_order_payments_history(order_id=123)
+        result = client.invoices.get_order_payments_history(order_id=123)
         
         assert "payments" in result
         assert len(result["payments"]) == 2

@@ -30,7 +30,7 @@ class TestCourier:
                 "length": 30
             }
         }
-        result = client.create_package_manual(**package_data)
+        result = client.courier.create_package_manual(**package_data)
         
         assert result["status"] == "SUCCESS"
         assert result["package_id"] == 789
@@ -58,7 +58,7 @@ class TestCourier:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_label(package_id=789)
+        result = client.courier.get_label(package_id=789)
         
         assert result["status"] == "SUCCESS"
         assert "label" in result
@@ -99,7 +99,7 @@ class TestCourier:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_order_packages(order_id=123)
+        result = client.courier.get_order_packages(order_id=123)
         
         assert "packages" in result
         assert len(result["packages"]) == 2
@@ -133,7 +133,7 @@ class TestCourier:
                 "country": "PL"
             }
         }
-        result = client.request_parcel_pickup(**pickup_data)
+        result = client.courier.request_parcel_pickup(**pickup_data)
         
         assert result["status"] == "SUCCESS"
         assert result["pickup_id"] == "PICKUP123"
@@ -179,7 +179,7 @@ class TestCourier:
                 "email": "john@example.com"
             }
         }
-        result = client.create_package_manual(**comprehensive_package)
+        result = client.courier.create_package_manual(**comprehensive_package)
         
         assert result["status"] == "SUCCESS"
         assert result["package_id"] == 791
@@ -198,7 +198,7 @@ class TestCourier:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_label(
+        result = client.courier.get_label(
             package_id=789,
             label_format="ZPL",
             label_size="100x150mm"

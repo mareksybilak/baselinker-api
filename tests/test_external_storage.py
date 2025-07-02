@@ -29,7 +29,7 @@ class TestExternalStorage:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_external_storages_list()
+        result = client.external_storage.get_external_storages_list()
         
         assert "storages" in result
         assert len(result["storages"]) == 2
@@ -71,9 +71,9 @@ class TestExternalStorage:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_external_storage_products_data(
+        result = client.external_storage.get_external_storage_products_data(
             storage_id="allegro_123",
-            filter_category_id="electronics"
+            products=["EXT123", "EXT456"]
         )
         
         assert "products" in result
@@ -84,7 +84,7 @@ class TestExternalStorage:
             'method': 'getExternalStorageProductsData',
             'parameters': json.dumps({
                 "storage_id": "allegro_123",
-                "filter_category_id": "electronics"
+                "products": ["EXT123", "EXT456"]
             })
         }
         mock_post.assert_called_with(
@@ -117,7 +117,7 @@ class TestExternalStorage:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_external_storage_products_quantity(
+        result = client.external_storage.get_external_storage_products_quantity(
             storage_id="allegro_123",
             products=["EXT123", "EXT456"]
         )
@@ -157,7 +157,7 @@ class TestExternalStorage:
                 }
             ]
         }
-        result = client.update_external_storage_products_quantity(**update_data)
+        result = client.external_storage.update_external_storage_products_quantity(**update_data)
         
         assert result["status"] == "SUCCESS"
         assert result["updated_products"] == 2
@@ -191,8 +191,9 @@ class TestExternalStorage:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_external_storage_products_data(
+        result = client.external_storage.get_external_storage_products_data(
             storage_id="ebay_456",
+            products=["FILTERED123"],
             filter_category_id="electronics",
             filter_name="laptop",
             filter_price_from=50.00,
@@ -229,7 +230,7 @@ class TestExternalStorage:
                 {"product_id": "EXT999", "variants": [{"variant_id": "V5", "stock": 50}]}
             ]
         }
-        result = client.update_external_storage_products_quantity(**bulk_update)
+        result = client.external_storage.update_external_storage_products_quantity(**bulk_update)
         
         assert result["status"] == "SUCCESS"
         assert result["updated_products"] == 4

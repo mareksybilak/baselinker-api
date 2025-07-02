@@ -84,7 +84,7 @@ class TestBaseLinkerClient:
         mock_post.return_value = mock_response
         
         client = BaseLinkerClient("test-token")
-        result = client.get_orders(date_from=123456)
+        result = client.orders.get_orders(date_from=123456)
         
         assert "orders" in result
         expected_data = {
@@ -107,15 +107,22 @@ class TestBaseLinkerClient:
         client = BaseLinkerClient("test-token")
         
         # Test order sources
-        result = client.get_order_sources()
+        result = client.orders.get_order_sources()
         assert result == {"status": "SUCCESS"}
         
         # Test set order status
-        result = client.set_order_status(order_id=123, status_id=1)
+        result = client.orders.set_order_status(order_id=123, status_id=1)
         assert result == {"status": "SUCCESS"}
         
         # Test add order product
-        result = client.add_order_product(order_id=123, product_id="ABC")
+        result = client.orders.add_order_product(
+            order_id=123, 
+            product_id="ABC", 
+            name="Test Product",
+            price_brutto=29.99,
+            tax_rate=23.0,
+            quantity=1
+        )
         assert result == {"status": "SUCCESS"}
     
     @patch('requests.Session.post')
@@ -128,11 +135,11 @@ class TestBaseLinkerClient:
         client = BaseLinkerClient("test-token")
         
         # Test get inventory products data
-        result = client.get_inventory_products_data(inventory_id=123)
+        result = client.products.get_inventory_products_data(inventory_id=123, products=["ABC", "DEF"])
         assert "products" in result
         
         # Test update stock
-        result = client.update_inventory_products_stock(
+        result = client.products.update_inventory_products_stock(
             inventory_id=123,
             products=[{"product_id": "ABC", "stock": 10}]
         )
@@ -148,14 +155,15 @@ class TestBaseLinkerClient:
         client = BaseLinkerClient("test-token")
         
         # Test create package manual
-        result = client.create_package_manual(
+        result = client.courier.create_package_manual(
             order_id=123,
-            courier_code="DPD"
+            courier_code="DPD",
+            package_number="123456789"
         )
         assert result == {"package_id": 123}
         
         # Test get label
-        result = client.get_label(package_id=123)
+        result = client.courier.get_label(package_id=123)
         assert result == {"package_id": 123}
     
     @patch('requests.Session.post')
@@ -168,9 +176,9 @@ class TestBaseLinkerClient:
         client = BaseLinkerClient("test-token")
         
         # Test get external storages
-        result = client.get_external_storages_list()
+        result = client.external_storage.get_external_storages_list()
         assert "storages" in result
         
         # Test get products data
-        result = client.get_external_storage_products_data(storage_id="123")
+        result = client.external_storage.get_external_storage_products_data(storage_id="123", products=["ABC", "DEF"])
         assert "storages" in result
